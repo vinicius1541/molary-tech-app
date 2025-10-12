@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model anamnese {
+  id                     BigInt    @id @default(autoincrement())
+  paciente_id            BigInt
+  queixa                 String
+  historico_doenca_atual String?
+  historico_medico       String?
+  historico_odonto       String?
+  alergias               String?
+  med_em_uso             String?
+  habitos                String?
+  dt_add                 DateTime? @db.Timestamp(6)
+  paciente               paciente  @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model atestado {
+  id             BigInt    @id @default(autoincrement())
+  paciente_id    BigInt
+  descricao      String?
+  dt_add         DateTime? @db.Timestamp(6)
+  responsavel_id BigInt
+  paciente       paciente  @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model colaborador {
+  id                 BigInt               @id @default(autoincrement())
+  nome               String
+  cargo_id           BigInt?
+  numero_cro         BigInt?
+  telefone           String?
+  email              String
+  endereco           String?
+  dt_criacao         DateTime             @db.Timestamp(6)
+  dt_atualizacao     DateTime?            @db.Timestamp(6)
+  external_user_id   String?              @db.VarChar(50)
+  cargo              cargo?               @relation(fields: [cargo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  horario_expediente horario_expediente[]
+}
+
+model consulta {
+  id             BigInt      @id @default(autoincrement())
+  paciente_id    BigInt
+  prontuario     BigInt?
+  responsavel_id BigInt
+  status         String
+  observacao     String?
+  dt_add         DateTime?   @db.Timestamp(6)
+  valor_consulta Decimal?    @db.Decimal(10, 2)
+  paciente       paciente    @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pagamento      pagamento[]
+}
+
+model etapa_tratamento {
+  id               BigInt           @id @default(autoincrement())
+  tratamento_id    BigInt
+  descricao        String?
+  status           String?
+  dt_add           DateTime?        @db.Timestamp(6)
+  responsavel_id   BigInt
+  plano_tratamento plano_tratamento @relation(fields: [tratamento_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model exames_clinicos {
+  id             BigInt    @id @default(autoincrement())
+  paciente_id    BigInt
+  obs_extra_oral String?
+  obs_intra_oral String?
+  observacoes    String?
+  dt_add         DateTime? @db.Timestamp(6)
+  img_path       String?
+  paciente       paciente  @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model paciente {
+  id                  BigInt                @id @default(autoincrement())
+  nome                String
+  documento           String?
+  telefone            String?
+  sexo                Int                   @db.SmallInt
+  email               String
+  endereco            String?
+  data_nascimento     DateTime              @db.Date
+  data_add            DateTime              @default(now()) @db.Date
+  agendamento         agendamento[]
+  anamnese            anamnese[]
+  atestado            atestado[]
+  consulta            consulta[]
+  exames_clinicos     exames_clinicos[]
+  plano_tratamento    plano_tratamento[]
+  receita             receita[]
+  responsaveis_legais responsaveis_legais[]
+}
+
+model plano_tratamento {
+  id               BigInt             @id @default(autoincrement())
+  paciente_id      BigInt
+  descricao        String?
+  dt_add           DateTime?          @db.Timestamp(6)
+  responsavel_id   BigInt
+  tipo_id          BigInt?
+  status           Boolean            @default(true)
+  etapa_tratamento etapa_tratamento[]
+  paciente         paciente           @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tipo_tratamento  tipo_tratamento?   @relation(fields: [tipo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model receita {
+  id             BigInt    @id @default(autoincrement())
+  paciente_id    BigInt
+  medicamento    String?
+  dosagem        String?
+  dt_add         DateTime? @db.Timestamp(6)
+  responsavel_id BigInt
+  paciente       paciente  @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model responsaveis_legais {
+  id          BigInt    @id @default(autoincrement())
+  paciente_id BigInt?
+  nome        String
+  documento   String
+  parentesco  String
+  telefone    String?
+  email       String
+  endereco    String?
+  paciente    paciente? @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model agendamento {
+  id             BigInt   @id @default(autoincrement())
+  paciente_id    BigInt
+  colaborador_id BigInt
+  data_hora      DateTime @db.Timestamp(6)
+  status         String
+  observacoes    String?
+  paciente       paciente @relation(fields: [paciente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pagamento {
+  id               BigInt    @id @default(autoincrement())
+  valor_pago       Decimal   @db.Decimal(10, 2)
+  data_pagamento   DateTime  @db.Timestamp(6)
+  metodo_pagamento String
+  consulta_id      BigInt?
+  consulta         consulta? @relation(fields: [consulta_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model tipo_tratamento {
+  id               BigInt             @id @default(autoincrement())
+  nome             String
+  descricao        String?
+  plano_tratamento plano_tratamento[]
+}
+
+model cargo {
+  id          BigInt        @id @default(autoincrement())
+  nome        String
+  colaborador colaborador[]
+}
+
+model horario_expediente {
+  id                BigInt      @id @default(autoincrement())
+  colaborador_id    BigInt
+  inicio_expediente DateTime    @db.Time(6)
+  fim_expediente    DateTime    @db.Time(6)
+  colaborador       colaborador @relation(fields: [colaborador_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
