@@ -22,7 +22,12 @@ import {
 } from "lucide-react"
 import {Button} from "@/components/ui/button"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
-import {UserButton} from "@clerk/nextjs";
+import dynamic from "next/dynamic"
+import { MolaryIconSmall } from "../logo/molary-icon-small"
+import { MolaryLogoSmall } from "../logo/molary-logo-small"
+
+// Importação dinâmica do UserButton só no client
+const UserButton = dynamic(() => import("@clerk/nextjs").then(mod => mod.UserButton), { ssr: false })
 
 const routes = [
     {
@@ -118,15 +123,14 @@ export function Sidebar() {
                     {/* Header */}
                     <div className="flex items-center justify-center p-3 border-b border-sidebar-border relative">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div
-                                className="flex-shrink-0 w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                                <ClipboardList className="h-5 w-5 text-primary-foreground"/>
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
+                                {!isExpanded && <MolaryIconSmall />}
                             </div>
                             <div className={cn(
                                 "transition-all duration-300 overflow-hidden",
                                 isExpanded ? "opacity-100 w-auto" : "opacity-0 w-0",
                             )}>
-                                <h2 className="font-bold text-lg text-sidebar-foreground whitespace-nowrap">Molary Tech</h2>
+                                <h2 className="font-bold text-lg text-sidebar-foreground whitespace-nowrap"><MolaryLogoSmall /></h2>
                                 <p className="text-xs text-sidebar-foreground/60 whitespace-nowrap">
                                     Clínica Odontológica
                                 </p>

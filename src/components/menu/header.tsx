@@ -1,11 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {ArrowRight, Menu, X} from "lucide-react"
-import { useState } from "react"
-import { MonicaoLogo } from "../logo/monicao-logo"
+import {useState} from "react"
 import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
 import Link from "next/link";
+import {MolaryIconSmall} from "@/components/logo/molary-icon-small";
 
 export function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -15,7 +15,7 @@ export function Header() {
             <div className="w-full px-4 md:px-6">
                 <div className="flex h-16 items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <MonicaoLogo />
+                        <MolaryIconSmall />
                         <span className="text-2xl font-bold text-foreground">Molary Tech</span>
                     </div>
 
