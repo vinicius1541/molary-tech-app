@@ -37,7 +37,7 @@ export async function getReceita(): Promise<Receita[]> {
         SELECT
             pagamentos_mes_atual.total_atual AS total,
             CASE
-                WHEN pagamentos_mes_anterior.total_anterior = 0 THEN NULL
+                WHEN pagamentos_mes_anterior.total_anterior = 0 THEN 0
                 ELSE ROUND(((pagamentos_mes_atual.total_atual - pagamentos_mes_anterior.total_anterior) * 100.0 /
                             pagamentos_mes_anterior.total_anterior), 2)
                 END AS variacao_perc
