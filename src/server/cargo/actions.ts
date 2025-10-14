@@ -15,12 +15,3 @@ export async function createOrUpdateCargo(cargo: cargo) {
         }
     })
 }
-export type Cargo = {
-    id: bigint
-    nome: string
-}
-export async function getCargos(): Promise<Cargo[]> {
-    return prisma.$queryRaw<Cargo[]>`
-        SELECT id, nome FROM cargo;
-    `
-}
