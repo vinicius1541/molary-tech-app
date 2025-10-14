@@ -36,7 +36,7 @@ export default async function Dashboard() {
         {
             title: "Receita Mensal",
             value: `R$ ${receitaMensal[0].total}`,
-            change: `+${receitaMensal[0].variacao_perc}%`,
+                        change: `+${receitaMensal[0].variacao_perc}%`,
             trend: "up" as const,
             icon: "DollarSign",
             color: "text-chart-3",

@@ -1,5 +1,5 @@
+import { MonicaoLogo } from "./logo/monicao-logo"
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react"
-import {MolaryLogoSmall} from "@/components/logo/molary-logo-small";
 
 export function Footer() {
     return (
@@ -8,7 +8,7 @@ export function Footer() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
                     <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-4">
-                            <MolaryLogoSmall />
+                            <MonicaoLogo />
                             <span className="text-2xl font-bold text-foreground">Molary Tech</span>
                         </div>
                         <p className="text-muted-foreground mb-4 max-w-sm">
