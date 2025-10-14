@@ -123,17 +123,20 @@ export function Sidebar() {
                     {/* Header */}
                     <div className="flex items-center justify-center p-3 border-b border-sidebar-border relative">
                         <div className="flex items-center gap-3 min-w-0">
+                            {!isExpanded &&
+
                             <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
-                                {!isExpanded && <MolaryIconSmall />}
-                            </div>
+                                {<MolaryIconSmall />}
+                            </div>}
+                            
                             <div className={cn(
                                 "transition-all duration-300 overflow-hidden",
                                 isExpanded ? "opacity-100 w-auto" : "opacity-0 w-0",
                             )}>
                                 <h2 className="font-bold text-lg text-sidebar-foreground whitespace-nowrap"><MolaryLogoSmall /></h2>
-                                <p className="text-xs text-sidebar-foreground/60 whitespace-nowrap">
+                                {/* <p className="text-xs text-sidebar-foreground/60 whitespace-nowrap">
                                     Clínica Odontológica
-                                </p>
+                                </p> */}
                             </div>
                         </div>
 
