@@ -11,8 +11,6 @@ export default clerkMiddleware(async (auth, req) => {
         await auth.protect()
     }
 
-    const { pathname } = req.nextUrl;
-
     // Não aplicar verificação para rotas específicas
     if (isPublicRoute(req)
         || isOnboardingRoute(req)
