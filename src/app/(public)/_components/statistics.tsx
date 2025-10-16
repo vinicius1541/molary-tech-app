@@ -34,6 +34,26 @@ const getCSSVariable = (variable: string) => {
     return ''
 }
 
+const withOpacity = (hex: string, opacity: number) => {
+    if (!hex) {
+        return `rgba(0, 0, 0, ${opacity})`
+    }
+    const value = hex.trim()
+    if (!value.startsWith("#")) {
+        return value
+    }
+    const normalized = value.length === 4
+        ? `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`
+        : value
+    if (normalized.length !== 7) {
+        return value
+    }
+    const r = parseInt(normalized.slice(1, 3), 16)
+    const g = parseInt(normalized.slice(3, 5), 16)
+    const b = parseInt(normalized.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
+
 const treatmentData = [
     { name: "Limpeza", value: 35, color: "--color-chart-1" },
     { name: "Restauração", value: 28, color: "--color-chart-2" },
@@ -54,8 +74,8 @@ const weeklyData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-white/95 backdrop-blur-sm border-2 border-primary/20 rounded-xl p-3 shadow-xl">
-                <p className="font-semibold text-foreground mb-1">{label}</p>
+            <div className="rounded-xl border border-primary/20 bg-card/90 p-3 shadow-lg backdrop-blur-sm">
+                <p className="mb-1 font-semibold text-card-foreground">{label}</p>
                 {payload.map((entry: any, index: number) => (
                     <p key={index} className="text-sm" style={{ color: entry.color }}>
                         {entry.name}: <span className="font-bold">{entry.value}</span>
@@ -76,6 +96,9 @@ export function Statistics() {
     const chart2 = getCSSVariable('--color-chart-2')
     const chart3 = getCSSVariable('--color-chart-3')
     const chart4 = getCSSVariable('--color-chart-4')
+    const borderColor = getCSSVariable('--color-border')
+    const mutedForeground = getCSSVariable('--color-muted-foreground')
+    const cardColor = getCSSVariable('--color-card')
 
     return (
         <section className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/30">
@@ -89,8 +112,8 @@ export function Statistics() {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-5 mb-5">
-                    <Card className="p-5 border-2 hover:border-primary/30 transition-all shadow-lg">
+                <div className="mb-5 grid gap-5 lg:grid-cols-2">
+                    <Card className="p-5 transition-all shadow-lg hover:border-primary/40">
                         <h3 className="text-lg font-semibold mb-4 text-primary">Consultas e Receita Mensal</h3>
                         <ResponsiveContainer width="100%" height={280}>
                             <AreaChart data={monthlyData}>
@@ -104,12 +127,12 @@ export function Statistics() {
                                         <stop offset="95%" stopColor={chart2} stopOpacity={0.05} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
-                                <XAxis dataKey="month" stroke="#6b7280" style={{ fontSize: "12px" }} />
-                                <YAxis yAxisId="left" stroke={chart1} style={{ fontSize: "12px" }} />
-                                <YAxis yAxisId="right" orientation="right" stroke={chart2} style={{ fontSize: "12px" }} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={withOpacity(borderColor, 0.4)} />
+                                <XAxis dataKey="month" stroke={withOpacity(mutedForeground, 0.6)} style={{ fontSize: "12px", fill: mutedForeground }} />
+                                <YAxis yAxisId="left" stroke={withOpacity(chart1, 0.8)} style={{ fontSize: "12px", fill: mutedForeground }} />
+                                <YAxis yAxisId="right" orientation="right" stroke={withOpacity(chart2, 0.8)} style={{ fontSize: "12px", fill: mutedForeground }} />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: "13px" }} />
+                                <Legend wrapperStyle={{ fontSize: "13px", color: mutedForeground }} />
                                 <Area
                                     yAxisId="left"
                                     type="monotone"
@@ -132,7 +155,7 @@ export function Statistics() {
                         </ResponsiveContainer>
                     </Card>
 
-                    <Card className="p-5 border-2 hover:border-secondary/30 transition-all shadow-lg">
+                    <Card className="p-5 transition-all shadow-lg hover:border-secondary/40">
                         <h3 className="text-lg font-semibold mb-4 text-secondary">Distribuição de Tratamentos</h3>
                         <ResponsiveContainer width="100%" height={280}>
                             <PieChart>
@@ -152,16 +175,16 @@ export function Statistics() {
                                     cx="50%"
                                     cy="50%"
                                     labelLine={{
-                                        stroke: "#94a3b8",
+                                        stroke: withOpacity(mutedForeground, 0.5),
                                         strokeWidth: 1,
                                     }}
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                     outerRadius={95}
                                     innerRadius={60}
-                                    fill="#8884d8"
+                                    fill={chart2}
                                     dataKey="value"
                                     paddingAngle={2}
-                                    stroke="#fff"
+                                    stroke={cardColor || primaryColor}
                                     strokeWidth={2}
                                 >
                                     {treatmentData.map((entry, index) => (
@@ -174,7 +197,7 @@ export function Statistics() {
                     </Card>
                 </div>
 
-                <Card className="p-5 border-2 hover:border-accent/30 transition-all shadow-lg">
+                <Card className="p-5 transition-all shadow-lg hover:border-accent/40">
                     <h3 className="text-lg font-semibold mb-4 text-accent">Fluxo de Pacientes Semanal</h3>
                     <ResponsiveContainer width="100%" height={280}>
                         <BarChart data={weeklyData} barSize={45}>
@@ -184,10 +207,10 @@ export function Statistics() {
                                     <stop offset="100%" stopColor={chart4} />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} vertical={false} />
-                            <XAxis dataKey="day" stroke="#6b7280" style={{ fontSize: "12px" }} axisLine={false} tickLine={false} />
-                            <YAxis stroke="#6b7280" style={{ fontSize: "12px" }} axisLine={false} tickLine={false} />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(139, 92, 246, 0.1)" }} />
+                            <CartesianGrid strokeDasharray="3 3" stroke={withOpacity(borderColor, 0.4)} opacity={0.6} vertical={false} />
+                            <XAxis dataKey="day" stroke={withOpacity(mutedForeground, 0.6)} style={{ fontSize: "12px", fill: mutedForeground }} axisLine={false} tickLine={false} />
+                            <YAxis stroke={withOpacity(mutedForeground, 0.6)} style={{ fontSize: "12px", fill: mutedForeground }} axisLine={false} tickLine={false} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: withOpacity(accentColor || chart3, 0.12) }} />
                             <Bar dataKey="pacientes" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Pacientes" />
                         </BarChart>
                     </ResponsiveContainer>

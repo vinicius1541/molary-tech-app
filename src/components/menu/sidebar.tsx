@@ -123,21 +123,20 @@ export function Sidebar() {
                     {/* Header */}
                     <div className="flex items-center justify-center p-3 border-b border-sidebar-border relative">
                         <div className="flex items-center gap-3 min-w-0">
-                            {!isExpanded &&
+                            <Link href="/">
+                                {!isExpanded &&
 
-                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
-                                {<MolaryIconSmall />}
-                            </div>}
-                            
-                            <div className={cn(
-                                "transition-all duration-300 overflow-hidden",
-                                isExpanded ? "opacity-100 w-auto" : "opacity-0 w-0",
-                            )}>
-                                <h2 className="font-bold text-lg text-sidebar-foreground whitespace-nowrap"><MolaryLogoSmall /></h2>
-                                {/* <p className="text-xs text-sidebar-foreground/60 whitespace-nowrap">
-                                    Clínica Odontológica
-                                </p> */}
-                            </div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
+                                    {<MolaryIconSmall />}
+                                </div>}
+
+                                <div className={cn(
+                                    "transition-all duration-300 overflow-hidden",
+                                    isExpanded ? "opacity-100 w-auto" : "opacity-0 w-0",
+                                )}>
+                                    <h2 className="font-bold text-lg text-sidebar-foreground whitespace-nowrap"><MolaryLogoSmall /></h2>
+                                </div>
+                            </Link>
                         </div>
 
                         <Button
@@ -163,7 +162,7 @@ export function Sidebar() {
                                                     "flex items-center rounded-lg transition-all duration-200",
                                                     isExpanded ? " gap-3 px-3 py-3" : "px-0 py-3 justify-center",
                                                     pathname === route.href
-                                                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                                                        ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
                                                         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                                             )}>
                                                 <route.icon className={cn("h-5 w-5 flex-shrink-0", pathname === route.href ? "" : route.color)} />

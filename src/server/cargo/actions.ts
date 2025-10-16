@@ -1,6 +1,6 @@
 "use server"
 
-import {cargo, PrismaClient} from "@/generated/prisma"
+import { cargo, PrismaClient } from "@/generated/prisma"
 
 const prisma = new PrismaClient()
 
@@ -18,9 +18,10 @@ export async function createOrUpdateCargo(cargo: cargo) {
 export type Cargo = {
     id: bigint
     nome: string
+    requer_cro: boolean
 }
 export async function getCargos(): Promise<Cargo[]> {
     return prisma.$queryRaw<Cargo[]>`
-        SELECT id, nome FROM cargo;
+        SELECT id, nome, requer_cro FROM cargo;
     `
 }

@@ -8,8 +8,8 @@ export function Hero() {
         <section
             className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/5 py-12 md:py-16">
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"/>
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/8 rounded-full blur-3xl"/>
+                <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl"/>
+                <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-secondary/10 blur-3xl"/>
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -17,7 +17,7 @@ export function Hero() {
                     <div className="space-y-6">
                         <div className="inline-block">
                           <span
-                              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-lg">
+                              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-lg">
                             <Sparkles className="h-4 w-4"/>
                             Sistema Completo de Gestão Odontológica
                           </span>
@@ -37,7 +37,7 @@ export function Hero() {
                             <SignedOut>
                                 <SignInButton>
                                     <Button size="lg"
-                                            className="bg-primary text-white hover:bg-primary/90 text-base px-6 shadow-lg cursor-pointer">
+                                            className="text-base px-6 shadow-lg cursor-pointer">
                                         Criar sua conta
                                         <ArrowRight className="ml-2 h-5 w-5"/>
                                     </Button>
@@ -45,7 +45,7 @@ export function Hero() {
                                 <Button
                                     size="lg"
                                     variant="outline"
-                                    className="text-base px-6 border-2 border-primary/30 hover:bg-primary bg-transparent cursor-pointer"
+                                    className="border-2 border-primary/30 bg-transparent px-6 text-base text-primary hover:bg-primary/10 cursor-pointer"
                                 >
                                     <Play className="mr-2 h-5 w-5"/>
                                     Ver Demonstração
@@ -54,7 +54,7 @@ export function Hero() {
                             <SignedIn>
                                 <Link href="/dashboard">
                                     <Button size="lg"
-                                            className="bg-primary text-white hover:bg-primary/90 text-base px-6 shadow-lg cursor-pointer">
+                                            className="text-base px-6 shadow-lg cursor-pointer">
                                         Acessar Dashboard
                                         <ArrowRight className="ml-2 h-5 w-5"/>
                                     </Button>
@@ -82,34 +82,34 @@ export function Hero() {
 
                     <div className="relative">
                         <div className="relative rounded-2xl bg-primary p-1 shadow-2xl">
-                            <div className="rounded-xl bg-white p-5 shadow-lg">
+                            <div className="rounded-xl bg-card p-5 shadow-lg">
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-base font-semibold text-gray-900">Consultas Hoje</h3>
+                                        <h3 className="text-base font-semibold text-card-foreground">Consultas Hoje</h3>
                                         <span
-                                            className="rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white shadow">
+                                            className="rounded-full bg-success px-3 py-1 text-xs font-semibold text-success-foreground shadow">
                       +12%
                     </span>
                                     </div>
                                     <div className="text-3xl font-bold text-primary">24</div>
-                                    <div className="h-2 w-full rounded-full bg-gray-100">
+                                    <div className="h-2 w-full rounded-full bg-muted">
                                         <div className="h-2 w-3/4 rounded-full bg-primary"/>
                                     </div>
                                     <div className="grid grid-cols-3 gap-3 pt-2">
                                         <div
-                                            className="rounded-lg bg-primary/10 p-2.5 text-center border border-primary/20">
+                                            className="rounded-lg border border-primary/20 bg-primary/10 p-2.5 text-center">
                                             <div className="text-xl font-bold text-primary">18</div>
-                                            <div className="text-[10px] text-gray-600">Concluídas</div>
+                                            <div className="text-[10px] text-muted-foreground">Concluídas</div>
                                         </div>
                                         <div
-                                            className="rounded-lg bg-secondary/10 p-2.5 text-center border border-secondary/20">
+                                            className="rounded-lg border border-secondary/20 bg-secondary/10 p-2.5 text-center">
                                             <div className="text-xl font-bold text-secondary">4</div>
-                                            <div className="text-[10px] text-gray-600">Pendentes</div>
+                                            <div className="text-[10px] text-muted-foreground">Pendentes</div>
                                         </div>
                                         <div
-                                            className="rounded-lg bg-accent/10 p-2.5 text-center border border-accent/20">
+                                            className="rounded-lg border border-accent/20 bg-accent/10 p-2.5 text-center">
                                             <div className="text-xl font-bold text-accent">2</div>
-                                            <div className="text-[10px] text-gray-600">Aguardando</div>
+                                            <div className="text-[10px] text-muted-foreground">Aguardando</div>
                                         </div>
                                     </div>
                                 </div>

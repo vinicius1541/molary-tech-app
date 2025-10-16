@@ -47,8 +47,8 @@ const appointments = [
 ]
 
 const statusConfig = {
-    confirmado: { label: "Confirmado", color: "bg-chart-3 text-chart-3" },
-    "em-andamento": { label: "Em Andamento", color: "bg-chart-2 text-chart-2" },
+    confirmado: { label: "Confirmado", color: "bg-success/100 text-success" },
+    "em-andamento": { label: "Em Andamento", color: "bg-warning/100 text-warning" },
     pendente: { label: "Pendente", color: "bg-muted-foreground text-muted-foreground" },
 }
 

@@ -1,8 +1,10 @@
-import {clerkMiddleware, createRouteMatcher} from '@clerk/nextjs/server';
+import {clerkClient, clerkMiddleware, createRouteMatcher} from '@clerk/nextjs/server';
 import {NextResponse} from 'next/server';
 import { clerkMetadata } from '@/lib/clerk-metadata';
 
 const isPublicRoute = createRouteMatcher(['/'])
+const isOnboardingRoute = createRouteMatcher(['/onboarding(.*)'])
+const isColaboradorSetupRoute = createRouteMatcher(['/colaborador/criar(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
     if (!isPublicRoute(req)) {
@@ -12,14 +14,17 @@ export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
 
     // Não aplicar verificação para rotas específicas
-    if (pathname.startsWith('/colaborador/criar')
-        || isPublicRoute(req)
+    if (isPublicRoute(req)
+        || isOnboardingRoute(req)
+        || isColaboradorSetupRoute(req)
     ) {
         return NextResponse.next();
     }
 
     // Obter informações do usuário autenticado
-    const { userId } = await auth();
+    const authState = await auth();
+    const { userId } = authState;
+
     if (!userId) {
         return NextResponse.redirect(new URL('/', req.url));
     }
@@ -27,8 +32,13 @@ export default clerkMiddleware(async (auth, req) => {
     // Verificar se o usuário completou o setup do colaborador
     // usando Clerk Public Metadata ao invés de cookies
     try {
-        const user = await auth(); // Obtém dados completos do usuário
-        
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+
+        if (!clerkMetadata.hasUsuario(user)) {
+            return NextResponse.redirect(new URL('/onboarding', req.url));
+        }
+
         if (!clerkMetadata.hasColaborador(user)) {
             // Usuário não tem colaborador configurado, redireciona para criação
             return NextResponse.redirect(new URL('/colaborador/criar', req.url));

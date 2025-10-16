@@ -41,8 +41,9 @@ model colaborador {
   endereco           String?
   dt_criacao         DateTime             @db.Timestamp(6)
   dt_atualizacao     DateTime?            @db.Timestamp(6)
-  external_user_id   String?              @db.VarChar(50)
+  usuario_id         BigInt               @unique
   cargo              cargo?               @relation(fields: [cargo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario            usuario              @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   horario_expediente horario_expediente[]
 }
 
@@ -164,6 +165,7 @@ model tipo_tratamento {
 model cargo {
   id          BigInt        @id @default(autoincrement())
   nome        String
+  requer_cro  Boolean       @default(false)
   colaborador colaborador[]
 }
 
@@ -173,4 +175,67 @@ model horario_expediente {
   inicio_expediente DateTime    @db.Time(6)
   fim_expediente    DateTime    @db.Time(6)
   colaborador       colaborador @relation(fields: [colaborador_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum UsuarioStatus {
+  ATIVO
+  INATIVO
+  SUSPENSO
+}
+
+model usuario {
+  id               BigInt         @id @default(autoincrement())
+  external_user_id String         @unique @db.VarChar(191)
+  email            String         @db.VarChar(191)
+  nome_exibicao    String?
+  status           UsuarioStatus  @default(ATIVO)
+  dt_criacao       DateTime       @default(now()) @db.Timestamp(6)
+  dt_atualizacao   DateTime?      @db.Timestamp(6)
+  ultimo_login     DateTime?      @db.Timestamp(6)
+  colaborador      colaborador?
+  usuario_roles    usuario_role[]
+
+  @@index([email])
+}
+
+model role {
+  id                BigInt            @id @default(autoincrement())
+  nome              String
+  slug              String            @unique
+  descricao         String?
+  hierarquia        Int               @default(100)
+  dt_criacao        DateTime          @default(now()) @db.Timestamp(6)
+  dt_atualizacao    DateTime?         @db.Timestamp(6)
+  usuario_roles     usuario_role[]
+  role_permissions  role_permission[]
+}
+
+model permission {
+  id               BigInt            @id @default(autoincrement())
+  chave            String            @unique
+  descricao        String?
+  categoria        String?
+  role_permissions role_permission[]
+}
+
+model usuario_role {
+  id           BigInt    @id @default(autoincrement())
+  usuario_id   BigInt
+  role_id      BigInt
+  atribuida_em DateTime  @default(now()) @db.Timestamp(6)
+  usuario      usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  role         role      @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([usuario_id, role_id])
+}
+
+model role_permission {
+  id             BigInt      @id @default(autoincrement())
+  role_id        BigInt
+  permission_id  BigInt
+  concedida_em   DateTime    @default(now()) @db.Timestamp(6)
+  role           role        @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  permission     permission  @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([role_id, permission_id])
 }

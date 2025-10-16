@@ -56,11 +56,11 @@ export function TreatmentStatus() {
 
                             <div className="grid grid-cols-3 gap-2 text-xs">
                                 <div className="rounded-md bg-chart-3/10 p-2 text-center">
-                                    <p className="font-medium text-chart-3">{treatment.concluidos}</p>
+                                    <p className="font-medium text-success">{treatment.concluidos}</p>
                                     <p className="text-muted-foreground">Concluídos</p>
                                 </div>
                                 <div className="rounded-md bg-chart-2/10 p-2 text-center">
-                                    <p className="font-medium text-chart-2">{treatment.emAndamento}</p>
+                                    <p className="font-medium text-warning">{treatment.emAndamento}</p>
                                     <p className="text-muted-foreground">Em Andamento</p>
                                 </div>
                                 <div className="rounded-md bg-muted p-2 text-center">
