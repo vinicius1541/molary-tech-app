@@ -1,85 +1,78 @@
 "use client"
 
-import {useState} from "react"
-import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {Check, ChevronLeft, ChevronRight} from "lucide-react"
-import {createOrUpdateColaborador} from "@/server/colaborador/actions";
-import {colaborador} from "@/generated/prisma";
-import {useRouter} from "next/navigation";
-import {useUser} from "@clerk/nextjs";
-import {Cargo} from "@/server/cargo/actions";
+import { useMemo, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { createOrUpdateColaborador } from "@/server/colaborador/actions"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 type FormData = {
     email: string
-    telefone: string | null
-    external_user_id: string | null
+    telefone: string
     nome: string
-    cargo_id: string
-    numero_cro: string
+    cargoId: string
+    numeroCro: string
     endereco: string
 }
 
-// const CARGO_OPTIONS = [
-//     "Dentista",
-//     "Ortodontista",
-//     "Endodontista",
-//     "Periodontista",
-//     "Implantodontista",
-//     "Cirurgião Bucomaxilofacial",
-//     "Auxiliar de Saúde Bucal",
-//     "Técnico em Saúde Bucal",
-//     "Recepcionista",
-//     "Gerente de Clínica",
-// ]
-
 const STEPS = [
-    { id: 1, title: "Informações Pessoais", description: "Dados básicos do colaborador" },
-    { id: 2, title: "Cargo/Permissão", description: "Defina o cargo do colaborador" },
-    { id: 3, title: "Número CRO", description: "Registro profissional (Conselhor Regional de Odontologia)" },
+    { id: 1, title: "Dados do Usuário", description: "Confirme ou ajuste seus dados principais" },
+    { id: 2, title: "Cargo e Permissões", description: "Defina o papel dentro da clínica" },
+    { id: 3, title: "Dados Profissionais", description: "Informações complementares do cargo" },
     { id: 4, title: "Revisão", description: "Confirme se os dados estão corretos" },
 ]
 
 type ValidationErrors = {
     email?: string
-    telefone?: string
+    numeroCro?: string
+}
+
+type UsuarioSetupData = {
+    nome: string | null
+    email: string
 }
 
 type ColaboradorFormProps = {
-    CARGO_OPTIONS: Cargo[]
+    cargos: Array<{
+        id: string
+        nome: string
+        requerCro: boolean
+    }>
+    usuario: UsuarioSetupData
 }
 
-export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
-    const {user} = useUser()
-    const router = useRouter();
+export function ColaboradorForm({ cargos, usuario }: ColaboradorFormProps) {
+    const router = useRouter()
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errors, setErrors] = useState<ValidationErrors>({})
     const [formData, setFormData] = useState<FormData>({
-        external_user_id: null,
-        nome: "",
-        cargo_id: "",
-        numero_cro: "",
+        nome: usuario.nome ?? "",
+        cargoId: "",
+        numeroCro: "",
         telefone: "",
-        email: "",
-        endereco: ""
+        email: usuario.email ?? "",
+        endereco: "",
     })
+
+    const selectedCargo = useMemo(() => {
+        return cargos.find((cargo) => cargo.id === formData.cargoId)
+    }, [cargos, formData.cargoId])
 
     const formatPhoneBrazil = (value: string) => {
         const numbers = value.replace(/\D/g, "")
         if (numbers.length <= 10) {
-            // Formato: (XX) XXXX-XXXX
             return numbers.replace(/^(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2")
-        } else {
-            // Formato: (XX) XXXXX-XXXX
-            return numbers
-                .replace(/^(\d{2})(\d)/, "($1) $2")
-                .replace(/(\d{5})(\d)/, "$1-$2")
-                .slice(0, 15)
         }
+        return numbers
+            .replace(/^(\d{2})(\d)/, "($1) $2")
+            .replace(/(\d{5})(\d)/, "$1-$2")
+            .slice(0, 15)
     }
 
     const validateEmail = (email: string) => {
@@ -87,14 +80,9 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
         return emailRegex.test(email)
     }
 
-    const updateFormData = (field: keyof colaborador, value: any) => {
-        if (field === "telefone") {
-            value = formatPhoneBrazil(value)
-        }
-        if (field === "numero_cro") {
-            value = value ? BigInt(value) : null
-        }
-        setFormData((prev) => ({ ...prev, [field]: value }))
+    const updateFormData = (field: keyof FormData, value: string) => {
+        const nextValue = field === "telefone" ? formatPhoneBrazil(value) : value
+        setFormData((prev) => ({ ...prev, [field]: nextValue }))
         if (errors[field as keyof ValidationErrors]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }))
         }
@@ -102,77 +90,65 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
 
     const canProceed = () => {
         switch (currentStep) {
-            case 1:
-                return formData.cargo_id !== null
-            case 2:
+            case 1: {
                 const isNameValid = formData.nome.trim() !== ""
                 const isEmailValid = formData.email.trim() !== "" && validateEmail(formData.email)
                 return isNameValid && isEmailValid
+            }
+            case 2:
+                return formData.cargoId !== ""
             case 3:
-                return formData.numero_cro !== null
+                if (!selectedCargo?.requerCro) {
+                    return true
+                }
+                return formData.numeroCro.trim() !== ""
             default:
                 return true
         }
     }
 
     const handleNext = () => {
-        if (currentStep === 2) {
-            const newErrors: ValidationErrors = {}
-
-            if (!validateEmail(formData.email)) {
-                newErrors.email = "Email inválido"
+        if (!canProceed()) {
+            if (currentStep === 1 && !validateEmail(formData.email)) {
+                setErrors((prev) => ({ ...prev, email: "Email inválido" }))
             }
-
-            if (Object.keys(newErrors).length > 0) {
-                setErrors(newErrors)
-                return
+            if (currentStep === 3 && selectedCargo?.requerCro && formData.numeroCro.trim() === "") {
+                setErrors((prev) => ({ ...prev, numeroCro: "Informe o número do CRO" }))
             }
+            return
         }
 
-        if (canProceed() && currentStep < STEPS.length) {
-            setCurrentStep(currentStep + 1)
+        if (currentStep < STEPS.length) {
+            setCurrentStep((prev) => prev + 1)
         }
     }
 
     const handlePrevious = () => {
         if (currentStep > 1) {
-            setCurrentStep(currentStep - 1)
+            setCurrentStep((prev) => prev - 1)
         }
     }
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            if (!user) {
-                alert("Usuário não autenticado")
-                setIsSubmitting(false)
-                return
-            }
-            // Monta objeto colaborador completo com conversões de tipos
-            const colaboradorData: colaborador = {
-                id: BigInt(0),
-                email: formData.email,
-                telefone: formData.telefone,
-                external_user_id: user.id,
-                nome: formData.nome,
-                cargo_id: formData.cargo_id ? BigInt(formData.cargo_id) : null,
-                numero_cro: formData.numero_cro ? BigInt(formData.numero_cro) : null,
-                endereco: formData.endereco,
-                dt_criacao: new Date(),
-                dt_atualizacao: null
-            }
-
-            const result = await createOrUpdateColaborador(colaboradorData)
+            const result = await createOrUpdateColaborador({
+                nome: formData.nome.trim(),
+                email: formData.email.trim(),
+                telefone: formData.telefone.trim() || null,
+                endereco: formData.endereco.trim() || null,
+                cargoId: formData.cargoId,
+                numeroCro: selectedCargo?.requerCro ? formData.numeroCro.trim() : null,
+            })
 
             if (result.success) {
-                // O metadata do Clerk será definido automaticamente pela server action
-                alert("Colaborador cadastrado com sucesso!")
+                toast.success("Colaborador cadastrado com sucesso!")
                 router.push("/dashboard")
             } else {
-                alert(`Erro: ${result.error}`)
+                toast.error(result.error)
             }
         } catch (error) {
-            alert("Erro ao cadastrar colaborador")
+            toast.error("Erro ao cadastrar colaborador. Tente novamente.")
         } finally {
             setIsSubmitting(false)
         }
@@ -180,7 +156,6 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
 
     return (
         <div className="space-y-8">
-            {/* Stepper */}
             <div className="flex items-center justify-between">
                 {STEPS.map((step, index) => (
                     <div key={step.id} className="flex items-center flex-1">
@@ -191,7 +166,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                         ? "bg-success text-success-foreground"
                                         : currentStep === step.id
                                             ? "bg-primary text-primary-foreground"
-                                            : ""
+                                            : "border border-border"
                                 }`}
                             >
                                 {currentStep > step.id ? <Check className="w-5 h-5" /> : step.id}
@@ -208,21 +183,21 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                         </div>
                         {index < STEPS.length - 1 && (
                             <div
-                                className={`h-0.5 flex-1 mx-2 transition-colors ${currentStep > step.id ? "bg-success" : "bg-border"}`}
+                                className={`h-0.5 flex-1 mx-2 transition-colors ${
+                                    currentStep > step.id ? "bg-success" : "bg-border"
+                                }`}
                             />
                         )}
                     </div>
                 ))}
             </div>
 
-            {/* Form Content */}
             <Card className="border-border bg-background">
                 <CardHeader>
                     <CardTitle>{STEPS[currentStep - 1].title}</CardTitle>
                     <CardDescription>{STEPS[currentStep - 1].description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* Step 1: Cargo */}
                     {currentStep === 1 && (
                         <div className="space-y-4">
                             <div className="space-y-2">
@@ -230,7 +205,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                 <Input
                                     id="nome"
                                     placeholder="Digite o nome completo"
-                                    value={formData.nome ?? ""}
+                                    value={formData.nome}
                                     onChange={(e) => updateFormData("nome", e.target.value)}
                                     className="text-base"
                                 />
@@ -241,7 +216,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                     id="email"
                                     type="email"
                                     placeholder="email@exemplo.com"
-                                    value={formData.email ?? ""}
+                                    value={formData.email}
                                     onChange={(e) => updateFormData("email", e.target.value)}
                                     className={`text-base ${errors.email ? "border-destructive" : ""}`}
                                 />
@@ -253,7 +228,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                     id="telefone"
                                     type="tel"
                                     placeholder="(00) 00000-0000"
-                                    value={formData.telefone ?? ""}
+                                    value={formData.telefone}
                                     onChange={(e) => updateFormData("telefone", e.target.value)}
                                     className="text-base"
                                     maxLength={15}
@@ -264,7 +239,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                 <Input
                                     id="endereco"
                                     placeholder="Rua, número, bairro, cidade"
-                                    value={formData.endereco ?? ""}
+                                    value={formData.endereco}
                                     onChange={(e) => updateFormData("endereco", e.target.value)}
                                     className="text-base"
                                 />
@@ -272,64 +247,80 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                         </div>
                     )}
 
-                    {/* Step 2: Informações Pessoais */}
                     {currentStep === 2 && (
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="cargo_id">Cargo *</Label>
                                 <Select
-                                    value={formData.cargo_id}
-                                    onValueChange={(value) => updateFormData("cargo_id", value)}
+                                    value={formData.cargoId}
+                                    onValueChange={(value) => updateFormData("cargoId", value)}
                                 >
                                     <SelectTrigger className="text-base">
                                         <SelectValue placeholder="Selecione o cargo" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {CARGO_OPTIONS.map((cargo) => (
-                                            <SelectItem key={cargo.id.toString()} value={cargo.id.toString()}>
+                                        {cargos.map((cargo) => (
+                                            <SelectItem key={cargo.id} value={cargo.id}>
                                                 {cargo.nome}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {selectedCargo && (
+                                    <p className="text-sm text-muted-foreground">
+                                        {selectedCargo.requerCro
+                                            ? "Este cargo exige registro profissional (CRO)."
+                                            : "Cargo administrativo: CRO não obrigatório."}
+                                    </p>
+                                )}
                             </div>
                         </div>
-
                     )}
 
-                    {/* Step 3: Número CRO */}
                     {currentStep === 3 && (
                         <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="numero_cro">Número CRO *</Label>
-                                <Input
-                                    id="numero_cro"
-                                    type="number"
-                                    placeholder="Digite o número do CRO"
-                                    value={formData.numero_cro !== null && formData.numero_cro !== undefined ? formData.numero_cro.toString() : ""}
-                                    onChange={(e) => updateFormData("numero_cro", e.target.value)}
-                                    className="text-base"
-                                />
-                                <p className="text-sm text-muted-foreground">Conselho Regional de Odontologia</p>
-                            </div>
+                            {selectedCargo?.requerCro ? (
+                                <div className="space-y-2">
+                                    <Label htmlFor="numero_cro">Número CRO *</Label>
+                                    <Input
+                                        id="numero_cro"
+                                        type="text"
+                                        placeholder="Digite o número do CRO"
+                                        value={formData.numeroCro}
+                                        onChange={(e) => updateFormData("numeroCro", e.target.value)}
+                                        className={`text-base ${errors.numeroCro ? "border-destructive" : ""}`}
+                                    />
+                                    {errors.numeroCro && (
+                                        <p className="text-sm text-destructive">{errors.numeroCro}</p>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">
+                                        Conselho Regional de Odontologia
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <p className="text-sm text-muted-foreground">
+                                        O cargo selecionado não exige registro no CRO. Você pode avançar para a próxima etapa.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    {/* Step 4: Revisão */}
                     {currentStep === 4 && (
                         <div className="space-y-4">
                             <div className="bg-muted rounded-lg p-4 space-y-3">
                                 <div>
                                     <p className="text-sm text-muted-foreground">Cargo</p>
-                                    <p className="font-medium">{formData.cargo_id ?? ""}</p>
+                                    <p className="font-medium">{selectedCargo?.nome ?? ""}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">Nome</p>
-                                    <p className="font-medium">{formData.nome ?? ""}</p>
+                                    <p className="font-medium">{formData.nome}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">Email</p>
-                                    <p className="font-medium">{formData.email ?? ""}</p>
+                                    <p className="font-medium">{formData.email}</p>
                                 </div>
                                 {formData.telefone && (
                                     <div>
@@ -345,14 +336,17 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                                 )}
                                 <div>
                                     <p className="text-sm text-muted-foreground">Número CRO</p>
-                                    <p className="font-medium">{formData.numero_cro !== null && formData.numero_cro !== undefined ? formData.numero_cro.toString() : ""}</p>
+                                    <p className="font-medium">
+                                        {selectedCargo?.requerCro ? formData.numeroCro || "Não informado" : "Não se aplica"}
+                                    </p>
                                 </div>
                             </div>
-                            <p className="text-sm text-muted-foreground">Revise as informações antes de finalizar o cadastro.</p>
+                            <p className="text-sm text-muted-foreground">
+                                Revise as informações antes de finalizar o cadastro.
+                            </p>
                         </div>
                     )}
 
-                    {/* Navigation Buttons */}
                     <div className="flex justify-between pt-6">
                         <Button type="button" variant="outline" onClick={handlePrevious} disabled={currentStep === 1}>
                             <ChevronLeft className="w-4 h-4 mr-2" />
@@ -360,7 +354,7 @@ export function ColaboradorForm({CARGO_OPTIONS}: ColaboradorFormProps) {
                         </Button>
 
                         {currentStep < STEPS.length ? (
-                            <Button type="button" onClick={handleNext} disabled={!canProceed()}>
+                            <Button type="button" onClick={handleNext}>
                                 Próximo
                                 <ChevronRight className="w-4 h-4 ml-2" />
                             </Button>

@@ -35,7 +35,7 @@ export default function RootLayout({
                 <body className="font-sans antialiased private-layout">
                 <Suspense fallback={
                     <div className="flex items-center justify-center h-screen">
-                        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+                        <div className="h-32 w-32 animate-spin rounded-full border-8 border-muted border-t-8 border-t-primary ease-linear"></div>
                     </div>
                 }>
                     <div className="flex h-screen overflow-hidden">

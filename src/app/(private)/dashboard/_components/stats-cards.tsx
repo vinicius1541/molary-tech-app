@@ -24,10 +24,10 @@ export function StatsCards({ stats }: { stats: StatItem[] }) {
                                 <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
                                 <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    <span className="font-medium text-chart-3">{stat.change}</span> vs mês anterior
+                                    <span className="font-medium text-green-500">{stat.change}</span> vs mês anterior
                                 </p>
                             </div>
-                            <div className={`rounded-lg bg-secondary p-3 ${stat.color}`}>
+                            <div className={`rounded-lg bg-secondary/50 p-3 ${stat.color}`}>
                                 <Icon className="h-5 w-5" />
                             </div>
                         </div>

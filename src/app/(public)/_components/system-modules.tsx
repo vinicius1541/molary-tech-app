@@ -53,7 +53,7 @@ const modules = [
     },
     {
         icon: Database,
-                title: "Diários Clínicos",
+        title: "Diários Clínicos",
         description: "Registro de observações importantes",
         features: ["Anotações", "Alertas", "Histórico", "Compartilhamento"],
         gradient: "from-secondary via-primary to-accent",
@@ -81,10 +81,10 @@ export function SystemModules() {
                     {modules.map((module, index) => (
                         <Card
                             key={index}
-                            className="p-4 hover:shadow-xl transition-all hover:-translate-y-1 border-2 hover:border-primary/30 bg-gradient-to-br from-card to-muted/20"
+                            className="bg-gradient-to-br from-card to-muted/20 p-4 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                         >
-                            <div className={`inline-flex rounded-lg p-2.5 bg-gradient-to-br ${module.gradient} mb-3 shadow-md`}>
-                                <module.icon className="h-5 w-5 text-white" />
+                            <div className={`mb-3 inline-flex rounded-lg bg-primary p-2.5 ${module.gradient} shadow-md`}>
+                                <module.icon className="h-5 w-5 text-on-primary" />
                             </div>
                             <h3 className="text-base font-semibold mb-1.5 text-card-foreground">{module.title}</h3>
                             <p className="text-xs text-muted-foreground mb-3">{module.description}</p>

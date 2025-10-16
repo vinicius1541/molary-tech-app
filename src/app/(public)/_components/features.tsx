@@ -41,7 +41,7 @@ const features = [
 
 export function Features() {
     return (
-        <section id="features" className="py-12 md:py-16 bg-background">
+    <section id="features" className="bg-background py-12 md:py-16">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-10">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
@@ -60,10 +60,10 @@ export function Features() {
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="group relative rounded-xl border-2 border-border bg-card p-5 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-primary/30"
+                            className="group relative rounded-xl border border-border bg-card p-5 shadow-lg transition-all hover:-translate-y-1 hover:border-primary/40"
                         >
-                            <div className={`inline-flex rounded-lg p-2.5 bg-gradient-to-br ${feature.gradient} mb-3 shadow-lg`}>
-                                <feature.icon className="h-5 w-5 text-white" />
+                            <div className={`mb-3 inline-flex rounded-lg bg-gradient-to-br p-2.5 ${feature.gradient} shadow-lg`}>
+                                <feature.icon className="h-5 w-5 text-on-primary" />
                             </div>
                             <h3 className="text-lg font-semibold mb-2 text-card-foreground">{feature.title}</h3>
                             <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>

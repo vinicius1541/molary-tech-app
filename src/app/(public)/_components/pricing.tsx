@@ -84,8 +84,8 @@ export function Pricing() {
                             }`}
                         >
                             {plan.popular && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 rounded-full text-xs font-semibold shadow-lg">
+                                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                    <span className="bg-gradient-to-r from-primary to-secondary px-4 py-1 rounded-full text-xs font-semibold shadow-lg text-on-primary">
                     Mais Popular
                   </span>
                                 </div>
@@ -116,7 +116,7 @@ export function Pricing() {
                             </ul>
 
                             <Button
-                                className={`w-full ${plan.popular ? "bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 shadow-lg" : "border-2"}`}
+                                className={`w-full ${plan.popular ? "bg-gradient-to-r from-primary to-secondary text-on-primary shadow-lg hover:opacity-90" : "border-2"}`}
                                 variant={plan.popular ? "default" : "outline"}
                             >
                                 {plan.cta}

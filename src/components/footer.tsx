@@ -7,9 +7,8 @@ export function Footer() {
             <div className="container mx-auto px-4">
                 <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
                     <div className="lg:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <MolaryLogoSmall />
-                            <span className="text-2xl font-bold text-foreground">Molary Tech</span>
+                        <div className="mb-4 flex items-center gap-2">
+                            <MolaryLogoSmall molaryColor="var(--foreground)"/>
                         </div>
                         <p className="text-muted-foreground mb-4 max-w-sm">
                             Sistema completo de gestão odontológica para modernizar sua clínica e proporcionar a melhor experiência
