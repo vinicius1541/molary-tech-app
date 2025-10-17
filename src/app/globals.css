@@ -230,6 +230,18 @@
     .text-destructive {
         color: var(--destructive);
     }
+    .text-primary {
+        color: var(--color-primary);
+    }
+    .text-secondary {
+        color: var(--color-secondary);
+    }
+    .text-accent {
+        color: var(--color-accent);
+    }
+    .text-muted {
+        color: var(--color-muted);
+    }
     .bg-success {
         background-color: var(--success);
         color: var(--success-foreground);
@@ -246,6 +258,26 @@
         background-color: var(--destructive);
         color: var(--destructive-foreground);
     }
+    .bg-ring {
+        background-color: var(--color-ring);
+        color: var(--color-foreground);
+    }
+    .bg-primary {
+        background-color: var(--color-primary);
+        color: var(--color-primary-foreground);
+    }
+    .bg-secondary {
+        background-color: var(--color-secondary);
+        color: var(--color-secondary-foreground);
+    }
+    .bg-accent {
+        background-color: var(--color-accent);
+        color: var(--color-accent-foreground);
+    }
+    .bg-muted {
+        background-color: var(--color-muted);
+        color: var(--color-muted-foreground);
+    }
     .border-success {
         border-color: var(--success);
     }
@@ -257,6 +289,18 @@
     }
     .border-destructive {
         border-color: var(--destructive);
+    }
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+    .border-secondary {
+        border-color: var(--color-secondary);
+    }
+    .border-accent {
+        border-color: var(--color-accent);
+    }
+    .border-muted {
+        border-color: var(--color-muted);
     }
     .bg-header {
         background-color: var(--header-bg);
@@ -281,5 +325,35 @@
     }
     .surface-muted {
         background-color: color-mix(in srgb, var(--muted) 65%, transparent);
+    }
+    .text-ring {
+        color: var(--color-ring);
+    }
+    .border-ring {
+        border-color: var(--color-ring);
+    }
+    .ring-accent {
+        --tw-ring-color: var(--color-ring);
+    }
+    .ring-primary {
+        --tw-ring-color: var(--color-primary);
+    }
+    .ring-secondary {
+        --tw-ring-color: var(--color-secondary);
+    }
+    .ring-muted {
+        --tw-ring-color: var(--color-muted);
+    }
+    .ring-success {
+        --tw-ring-color: var(--success);
+    }
+    .ring-info {
+        --tw-ring-color: var(--info);
+    }
+    .ring-warning {
+        --tw-ring-color: var(--warning);
+    }
+    .ring-destructive {
+        --tw-ring-color: var(--destructive);
     }
 }

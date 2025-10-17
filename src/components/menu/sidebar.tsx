@@ -200,7 +200,7 @@ export function Sidebar() {
                                         userButtonOuterIdentifier: cn(
                                             "text-sm font-medium transition-all duration-300",
                                             isExpanded
-                                                ? "opacity-100 ml-2 !text-blue-500"
+                                                ? "opacity-100 ml-2 !text-primary"
                                                 : "opacity-0 w-0"
                                         )
                                     }

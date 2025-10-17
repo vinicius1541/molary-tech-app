@@ -9,6 +9,8 @@ export interface UserMetadata {
   userType?: 'colaborador' | 'admin';
   setupCompleted?: boolean;
   onboardingStep?: 'usuario' | 'colaborador' | 'completed';
+  roles?: string[];
+  permissions?: string[];
   [key: string]: any; // Index signature para compatibilidade com Clerk
 }
 
@@ -68,6 +70,34 @@ export const clerkMetadata = {
   // Obter ID do colaborador do metadata
   getColaboradorId(user: any): string | null {
     return user?.publicMetadata?.colaboradorId || null;
+  },
+
+  async setAuthz(
+    userId: string,
+    payload: { roles: string[]; permissions: string[] }
+  ): Promise<void> {
+    try {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          roles: payload.roles,
+          permissions: payload.permissions,
+        },
+      });
+    } catch (error) {
+      console.error('Erro ao sincronizar metadata de autorização:', error);
+      throw new Error('Falha ao sincronizar permissões do usuário');
+    }
+  },
+
+  getPermissions(user: any): string[] {
+    const value = user?.publicMetadata?.permissions;
+    return Array.isArray(value) ? (value as string[]) : [];
+  },
+
+  getRoles(user: any): string[] {
+    const value = user?.publicMetadata?.roles;
+    return Array.isArray(value) ? (value as string[]) : [];
   },
 
   // Verificar se setup foi completado
