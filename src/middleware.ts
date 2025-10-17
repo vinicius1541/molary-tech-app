@@ -1,6 +1,7 @@
 import {clerkClient, clerkMiddleware, createRouteMatcher} from '@clerk/nextjs/server';
 import {NextResponse} from 'next/server';
 import { clerkMetadata } from '@/lib/clerk-metadata';
+import { getRequiredPermissionsForRoute } from '@/lib/route-permissions';
 
 const isPublicRoute = createRouteMatcher(['/'])
 const isOnboardingRoute = createRouteMatcher(['/onboarding(.*)'])
@@ -40,6 +41,26 @@ export default clerkMiddleware(async (auth, req) => {
         if (!clerkMetadata.hasColaborador(user)) {
             // Usuário não tem colaborador configurado, redireciona para criação
             return NextResponse.redirect(new URL('/colaborador/criar', req.url));
+        }
+
+        const requiredPermissions = getRequiredPermissionsForRoute(req);
+
+        if (requiredPermissions.length > 0) {
+            const userPermissions = clerkMetadata.getPermissions(user);
+
+            if (userPermissions.length === 0) {
+                return NextResponse.redirect(new URL('/onboarding', req.url));
+            }
+
+            const hasAllPermissions = requiredPermissions.every((permission) =>
+                userPermissions.includes(permission)
+            );
+
+            if (!hasAllPermissions) {
+                const redirectUrl = new URL('/', req.url);
+                redirectUrl.searchParams.set('unauthorized', '1');
+                return NextResponse.redirect(redirectUrl);
+            }
         }
 
         // Usuário tem colaborador, pode prosseguir

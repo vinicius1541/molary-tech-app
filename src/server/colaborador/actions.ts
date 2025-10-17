@@ -63,6 +63,13 @@ export async function createOrUpdateColaborador(
             return usuarioResult;
         }
 
+        if (!usuarioResult.usuario.permissions.includes("colaborador.manage")) {
+            return {
+                success: false,
+                error: "Você não tem permissão para gerenciar colaboradores.",
+            } as const;
+        }
+
         const usuarioId = BigInt(usuarioResult.usuario.id);
         const cargoId = BigInt(parseResult.data.cargoId);
 
